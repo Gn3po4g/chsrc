@@ -9,12 +9,12 @@
  *               | Shengwei Chen <414685209@qq.com>
  *               |
  * Created on    : <2023-08-28>
- * Last modified : <2024-07-03>
+ * Last modified : <2024-07-09>
  *
  * chsrc: Change Source —— 全平台通用命令行换源工具
  * ------------------------------------------------------------*/
 
-#define Chsrc_Version      "v0.1.7.rc2-2024/07/03"
+#define Chsrc_Version      "v0.1.7.rc5-2024/07/09"
 #define Chsrc_Maintain_URL "https://gitee.com/RubyMetric/chsrc"
 
 #include "chsrc.h"
@@ -351,8 +351,8 @@ pl_php_setsrc (char *option)
 void
 pl_lua_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("~/.luarocks/config.lua");
-  chsrc_take_a_look_at_file ("~/.luarocks/upload_config.lua");
+  chsrc_view_file ("~/.luarocks/config.lua");
+  chsrc_view_file ("~/.luarocks/upload_config.lua");
 }
 
 /**
@@ -428,7 +428,7 @@ pl_go_setsrc (char *option)
 void
 pl_rust_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("~/.cargo");
+  chsrc_view_file ("~/.cargo");
 }
 
 /**
@@ -728,11 +728,11 @@ pl_r_getsrc (char *option)
   //
   if (xy_on_windows)
     {
-      chsrc_take_a_look_at_file ("~/Documents/.Rprofile");
+      chsrc_view_file ("~/Documents/.Rprofile");
     }
   else
     {
-      chsrc_take_a_look_at_file ("~/.Rprofile");
+      chsrc_view_file ("~/.Rprofile");
     }
 }
 
@@ -778,7 +778,7 @@ pl_r_setsrc (char *option)
 void
 pl_julia_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("~/.julia/config/startup.jl");
+  chsrc_view_file ("~/.julia/config/startup.jl");
 }
 
 /**
@@ -914,13 +914,13 @@ os_ubuntu_getsrc (char *option)
 {
   if (chsrc_check_file (ETC_APT_DEB822_Ubuntu_Sources))
     {
-      chsrc_take_a_look_at_file (ETC_APT_DEB822_Ubuntu_Sources);
+      chsrc_view_file (ETC_APT_DEB822_Ubuntu_Sources);
       return;
     }
 
   if (chsrc_check_file (ETC_APT_SOURCELIST))
     {
-      chsrc_take_a_look_at_file (ETC_APT_SOURCELIST);
+      chsrc_view_file (ETC_APT_SOURCELIST);
       return;
     }
 
@@ -1005,7 +1005,7 @@ os_ubuntu_setsrc (char *option)
 void
 os_mint_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("/etc/apt/sources.list.d/official-package-repositories.list");
+  chsrc_view_file ("/etc/apt/sources.list.d/official-package-repositories.list");
 }
 
 /**
@@ -1038,13 +1038,13 @@ os_debian_getsrc (char *option)
 {
   if (chsrc_check_file (ETC_APT_DEB822_Debian_Sources))
     {
-      chsrc_take_a_look_at_file (ETC_APT_DEB822_Debian_Sources);
+      chsrc_view_file (ETC_APT_DEB822_Debian_Sources);
       return;
     }
 
   if (chsrc_check_file (ETC_APT_SOURCELIST))
     {
-      chsrc_take_a_look_at_file (ETC_APT_SOURCELIST);
+      chsrc_view_file (ETC_APT_SOURCELIST);
       return;
     }
 
@@ -1064,11 +1064,11 @@ os_debian_setsrc_for_deb822 (char *option)
 
   chsrc_backup (ETC_APT_DEB822_Debian_Sources);
 
-  char *cmd = xy_strjoin (3, "sed -E -i \'s@https?://.*/debian/?@", source.url, "@g\' " ETC_APT_DEB822_Debian_Sources);
+  char *cmd = xy_strjoin (3, "sed -E -i 's@https?://.*/debian/?@", source.url, "@g' " ETC_APT_DEB822_Debian_Sources);
   chsrc_run (cmd, RunOpt_Default);
 
   // debian-security 源和其他源不一样
-  cmd = xy_strjoin (3, "sed -E -i \'s@https?://.*/debian-security/?@", source.url, "-security", "@g\' " ETC_APT_DEB822_Debian_Sources);
+  cmd = xy_strjoin (3, "sed -E -i 's@https?://.*/debian-security/?@", source.url, "-security@g' " ETC_APT_DEB822_Debian_Sources);
   chsrc_run (cmd, RunOpt_Default);
 
   chsrc_run ("apt update", RunOpt_No_Last_New_Line);
@@ -1121,7 +1121,7 @@ os_debian_setsrc (char *option)
 void
 os_raspberrypi_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("/etc/apt/sources.list.d/raspi.list");
+  chsrc_view_file ("/etc/apt/sources.list.d/raspi.list");
 }
 
 void
@@ -1150,7 +1150,7 @@ os_armbian_getsrc (char *option)
 {
   if (chsrc_check_file (OS_Armbian_SOURCELIST))
     {
-      chsrc_take_a_look_at_file (OS_Armbian_SOURCELIST);
+      chsrc_view_file (OS_Armbian_SOURCELIST);
       return;
     }
 
@@ -1185,7 +1185,7 @@ os_armbian_setsrc (char *option)
 void
 os_deepin_getsrc(char *option)
 {
-  chsrc_take_a_look_at_file (ETC_APT_SOURCELIST);
+  chsrc_view_file (ETC_APT_SOURCELIST);
 }
 
 /**
@@ -1312,7 +1312,7 @@ os_opensuse_setsrc (char *option)
 void
 os_kali_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file (ETC_APT_SOURCELIST);
+  chsrc_view_file (ETC_APT_SOURCELIST);
 }
 
 /**
@@ -1373,7 +1373,7 @@ os_msys2_setsrc (char *option)
 void
 os_arch_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file (OS_Pacman_MirrorList);
+  chsrc_view_file (OS_Pacman_MirrorList);
 }
 
 /**
@@ -1425,7 +1425,7 @@ os_arch_setsrc (char *option)
 void
 os_archlinuxcn_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file (OS_Pacman_MirrorList);
+  chsrc_view_file (OS_Pacman_MirrorList);
 }
 
 /**
@@ -1532,7 +1532,7 @@ os_alma_setsrc (char *option)
 void
 os_alpine_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("/etc/apk/repositories");
+  chsrc_view_file ("/etc/apk/repositories");
 }
 
 /**
@@ -1635,7 +1635,7 @@ os_manjaro_setsrc (char *option)
 void
 os_trisquel_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file (ETC_APT_SOURCELIST);
+  chsrc_view_file (ETC_APT_SOURCELIST);
 }
 
 /**
@@ -1664,7 +1664,7 @@ os_trisquel_setsrc (char *option)
 void
 os_linuxlite_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file (ETC_APT_SOURCELIST);
+  chsrc_view_file (ETC_APT_SOURCELIST);
 }
 
 /**
@@ -1738,7 +1738,7 @@ os_anolis_setsrc (char *option)
 void
 os_openkylin_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file (ETC_APT_SOURCELIST);
+  chsrc_view_file (ETC_APT_SOURCELIST);
 }
 
 void
@@ -1871,7 +1871,7 @@ os_freebsd_setsrc (char *option)
 void
 os_netbsd_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("/usr/pkg/etc/pkgin/repositories.conf");
+  chsrc_view_file ("/usr/pkg/etc/pkgin/repositories.conf");
 }
 
 /**
@@ -1910,7 +1910,7 @@ os_netbsd_setsrc (char *option)
 void
 os_openbsd_getsrc (char *option)
 {
-  chsrc_take_a_look_at_file ("/etc/installurl");
+  chsrc_view_file ("/etc/installurl");
 }
 
 /**
@@ -2095,23 +2095,33 @@ wr_brew_setsrc (char *option)
   chsrc_yield_source (wr_brew);
   chsrc_confirm_source (&source);
 
-  char *splitter        = "\n\n# Generated by chsrc " Chsrc_Version "\n";
+  char *splitter        = "\n\n# Generated by chsrc " Chsrc_Version;
   char *api_domain      = xy_strjoin (3, "export HOMEBREW_API_DOMAIN=\"",      xy_2strjoin (source.url, "homebrew-bottles/api"),  "\"");
   char *bottle_domain   = xy_strjoin (3, "export HOMEBREW_BOTTLE_DOMAIN=\"",   xy_2strjoin (source.url, "homebrew-bottles"),      "\"");
   char *brew_git_remote = xy_strjoin (3, "export HOMEBREW_BREW_GIT_REMOTE=\"", xy_2strjoin (source.url, "git/homebrew/brew.git"), "\"");
   char *core_git_remote = xy_strjoin (3, "export HOMEBREW_CORE_GIT_REMOTE=\"", xy_2strjoin (source.url, "git/homebrew/homebrew-core.git"), "\"");
 
-  chsrc_backup ("~/.zshrc");
-  chsrc_backup ("~/.bashrc");
+  char *zshrc = "~/.zshrc";
+  chsrc_backup (zshrc);
+  chsrc_append_to_file (splitter,        zshrc);
+  chsrc_append_to_file (api_domain,      zshrc);
+  chsrc_append_to_file (bottle_domain,   zshrc);
+  chsrc_append_to_file (brew_git_remote, zshrc);
+  chsrc_append_to_file (core_git_remote, zshrc);
 
-  chsrc_append_to_file (splitter,        "~/.bashrc >> ~/.zshrc");
-  chsrc_append_to_file (api_domain,      "~/.bashrc >> ~/.zshrc");
-  chsrc_append_to_file (bottle_domain,   "~/.bashrc >> ~/.zshrc");
-  chsrc_append_to_file (brew_git_remote, "~/.bashrc >> ~/.zshrc");
-  chsrc_append_to_file (core_git_remote, "~/.bashrc >> ~/.zshrc");
+  char *bashrc = "~/.bashrc";
+  if (xy_file_exist (bashrc))
+    {
+      chsrc_backup ("~/.bashrc");
+      chsrc_append_to_file (splitter,        bashrc);
+      chsrc_append_to_file (api_domain,      bashrc);
+      chsrc_append_to_file (bottle_domain,   bashrc);
+      chsrc_append_to_file (brew_git_remote, bashrc);
+      chsrc_append_to_file (core_git_remote, bashrc);
+    }
 
   chsrc_say_lastly (&source, ChsrcTypeAuto);
-  chsrc_note_remarkably ("请您重启终端使环境变量生效");
+  chsrc_note_remarkably ("请您重启终端使Homebrew环境变量生效");
 }
 
 
@@ -2210,7 +2220,7 @@ wr_dockerhub_getsrc (char *option)
 {
   if (xy_on_linux || xy_on_bsd)
     {
-      chsrc_take_a_look_at_file ("/etc/docker/daemon.json");
+      chsrc_view_file ("/etc/docker/daemon.json");
     }
   else
     {
@@ -2358,7 +2368,7 @@ static const char
 *pl_lua   [] = {"lua",   "luarocks",                     NULL,  t(&pl_lua_target)},
 *pl_go    [] = {"go",    "golang",  "goproxy",           NULL,  t(&pl_go_target)} ,
 *pl_rust  [] = {"rust",  "cargo",   "crate",  "crates",  NULL,  t(&pl_rust_target)},
-*pl_java  [] = {"java",  "maven",   "gradle",            NULL,  t(&pl_java_target)},
+*pl_java  [] = {"java",  "maven",   "mvn",    "gradle",  NULL,  t(&pl_java_target)},
 *pl_clojure[] ={"clojure","clojars","cloj",   "lein",   "leiningen",  NULL, t(&pl_clojure_target)},
 *pl_dart  [] = {"dart",  "pub",     "flutter",           NULL,  t(&pl_dart_target)},
 *pl_dotnet[] = {"nuget", "net",     ".net",   "dotnet",  NULL,  t(&pl_dotnet_target)},
@@ -2582,7 +2592,7 @@ print_supported_sources_for_target (SourceInfo sources[], size_t size)
 void
 cli_print_version ()
 {
-  puts (xy_strjoin (3, "chsrc: Change Source (GPLv3) ",
+  puts (xy_strjoin (3, "chsrc: Change Source (GPL-3.0) ",
                       xy_str_to_magenta (Chsrc_Version), " by RubyMetric"));
 }
 

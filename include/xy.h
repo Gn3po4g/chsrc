@@ -7,7 +7,7 @@
  * Contributors  : Null Nil   <null@nil.com>
  *               |
  * Created on    : <2023-08-28>
- * Last modified : <2024-06-21>
+ * Last modified : <2024-07-09>
  *
  * xy: 襄阳、咸阳
  * Corss-Platform C utilities for CLI applications in Ruby flavor
@@ -16,7 +16,7 @@
 #ifndef XY_H
 #define XY_H
 
-#define _XY_Version      "v0.1.2.3-2024/06/21"
+#define _XY_Version      "v0.1.3.0-2024/07/09"
 #define _XY_Maintain_URL "https://gitee.com/RubyMetric/chsrc/blob/main/include/xy.h"
 
 #include <assert.h>
@@ -31,6 +31,7 @@
 // #define NDEBUG
 
 #ifdef _WIN32
+  #define XY_On_Windows 1
   #define xy_on_windows true
   #define xy_on_linux false
   #define xy_on_macos false
@@ -40,6 +41,7 @@
   #define xy_useutf8() SetConsoleOutputCP (65001)
 
 #elif defined(__linux__) || defined(__linux)
+  #define XY_On_Linux 1
   #define xy_on_windows false
   #define xy_on_linux true
   #define xy_on_macos false
@@ -48,6 +50,7 @@
   #define xy_useutf8()
 
 #elif defined(__APPLE__)
+  #define XY_On_macOS 1
   #define xy_on_windows false
   #define xy_on_linux false
   #define xy_on_macos true
@@ -56,6 +59,7 @@
   #define xy_useutf8()
 
 #elif defined(__OpenBSD__) || defined(__NetBSD__) || defined(__FreeBSD__)
+  #define XY_On_BSD 1
   #define xy_on_windows false
   #define xy_on_linux false
   #define xy_on_macos false
@@ -633,15 +637,61 @@ _xy_win_powershellv5_profile ()
 static bool
 xy_file_exist (const char *path)
 {
-  const char *newpath = path;
+  const char *new_path = path;
+  if (xy_str_start_with (path, "~"))
+    {
+      new_path = xy_2strjoin (xy_os_home, path + 1);
+    }
+  // 0 即 F_OK
+  return (0==access (new_path, 0)) ? true : false;
+}
+
+/**
+ * @note xy_file_exist() 和 xy_dir_exist() 两个函数在所有平台默认都支持使用 '~'，
+ *       但实现中都没有调用 xy_uniform_path()，以防万一，调用前可能需要用户手动调用它
+ */
+static bool
+xy_dir_exist (const char *path)
+{
+  const char *dir = path;
   if (xy_on_windows)
     {
       if (xy_str_start_with (path, "~"))
         {
-          newpath = xy_2strjoin (xy_os_home, path + 1);
+          dir = xy_2strjoin (xy_os_home, path + 1);
         }
     }
-  return access (newpath, 0) ? false : true;
+
+  if (xy_on_windows)
+    {
+#ifdef XY_On_Windows
+      // 也可以用 opendir() #include <dirent.h>
+      DWORD attr = GetFileAttributesA (dir);
+
+      if (attr == INVALID_FILE_ATTRIBUTES)
+        {
+          // Q: 我们应该报错吗？
+          return false;
+        }
+      else if (attr & FILE_ATTRIBUTE_DIRECTORY)
+        {
+          return true;
+        }
+      else
+        {
+          return false;
+        }
+#endif
+    }
+  else
+    {
+      int status = system (xy_2strjoin ("test -d ", dir));
+
+      if (0==status)
+        return true;
+      else
+        return false;
+    }
 }
 
 /**

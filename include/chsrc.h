@@ -7,7 +7,7 @@
  * Contributors  : Peng Gao   <gn3po4g@outlook.com>
  *               |
  * Created on    : <2023-08-29>
- * Last modified : <2024-07-03>
+ * Last modified : <2024-07-09>
  *
  * chsrc 头文件
  * ------------------------------------------------------------*/
@@ -614,7 +614,7 @@ chsrc_run (const char *cmd, int run_option)
 
 
 static void
-chsrc_take_a_look_at_file (const char *path)
+chsrc_view_file (const char *path)
 {
   char *cmd = NULL;
   path = xy_uniform_path (path);
@@ -633,10 +633,17 @@ static void
 chsrc_ensure_dir (const char *dir)
 {
   dir = xy_uniform_path (dir);
+
+  if (xy_dir_exist (dir))
+    {
+      return;
+    }
+
+  // 不存在就生成
   char *mkdir_cmd = NULL;
   if (xy_on_windows)
     {
-      mkdir_cmd = "md ";
+      mkdir_cmd = "md ";  // 已存在时返回 errorlevel = 1
     }
   else
     {
@@ -644,7 +651,8 @@ chsrc_ensure_dir (const char *dir)
     }
   char *cmd = xy_2strjoin (mkdir_cmd, dir);
   cmd = xy_str_to_quietcmd (cmd);
-  chsrc_run (cmd, RunOpt_Default);
+  chsrc_run (cmd, RunOpt_No_Last_New_Line|RunOpt_No_Note_On_Sccess);
+  chsrc_note_remarkably (xy_2strjoin ("目录不存在，已自动创建 ", dir));
 }
 
 static void
@@ -663,7 +671,7 @@ chsrc_append_to_file (const char *str, const char *file)
     {
       cmd = xy_strjoin (4, "echo '", str, "' >> ", file);
     }
-  chsrc_run (cmd, RunOpt_Default);
+  chsrc_run (cmd, RunOpt_No_Last_New_Line|RunOpt_No_Note_On_Sccess);
 }
 
 static void
@@ -682,7 +690,7 @@ chsrc_prepend_to_file (const char *str, const char *file)
     {
       cmd = xy_strjoin (4, "sed -i '1i ", str, "' ", file);
     }
-  chsrc_run (cmd, RunOpt_Default);
+  chsrc_run (cmd, RunOpt_No_Last_New_Line|RunOpt_No_Note_On_Sccess);
 }
 
 static void
@@ -709,9 +717,9 @@ chsrc_backup (const char *path)
 {
   char *cmd = NULL;
 
-  if (xy_on_bsd)
+  if (xy_on_bsd || xy_on_macos)
     {
-      // 似乎BSD的cp并没有 --backup='t' 选项
+      /* BSD 和 macOS 的 cp 不支持 --backup 选项 */
       cmd = xy_strjoin (5, "cp -f ", path, " ", path, ".bak");
     }
   else if (xy_on_windows)
@@ -724,7 +732,7 @@ chsrc_backup (const char *path)
       cmd = xy_strjoin (5, "cp ", path, " ", path, ".bak --backup='t'");
     }
 
-  chsrc_run (cmd, RunOpt_No_Last_New_Line);
+  chsrc_run (cmd, RunOpt_No_Last_New_Line|RunOpt_No_Note_On_Sccess);
   chsrc_note_remarkably (xy_strjoin (3, "备份文件名为 ", path, ".bak"));
 }
 
